@@ -1,0 +1,43 @@
+parameters:
+  uploads_directory: "%kernel.project_dir%/public/uploads" # Définir le chemin du répertoire de téléchargement
+services:
+  _defaults:
+    autowire: true # Autowiring permet à Symfony d'injecter automatiquement les dépendances
+    autoconfigure: true #
+    public: false
+  # Enregistre tous les contrôleurs dans le namespace App\Controller
+  App\Controller\:
+    resource: "../src/Controller"
+    exclude: "../src/Controller/{Debugger,Tests,Test}"
+    # type: attribute # Indique que les routes sont définies via des attributs
+    # tags: ["controller.service_arguments"]
+    public: true # Rend le contrôleur public
+  App\Encoder\MultipartDecoder:
+    arguments:
+      $requestStack: "@request_stack"
+    tags:
+      - { name: "serializer.encoder", priority: 10 }
+  App\Serializer\PhotoDenormalizer:
+    tags:
+      - { name: "serializer.denormalizer", priority: 100 }
+  App\Serializer\PhotoNormalizer:
+    arguments:
+      - "@api_platform.jsonld.normalizer.item"
+      - "@vich_uploader.storage"
+    tags:
+      - { name: "serializer.normalizer", priority: 100 }
+  App\Repository\WalkRepository:
+    tags: ["doctrine.repository_service"]
+  App\Repository\PhotoEntityRepository:
+    arguments:
+      $registry: "@doctrine"
+  # Déclare le contrôleur UploadController explicitement comme un service public
+  # App\Controller\UploadController:
+  #   autowire: true
+  #   autoconfigure: true
+  #   tags: ["controller.service_arguments"]
+  #   public: true # Assurez-vous que ce contrôleur est public
+# App\Serializer\MultipartInputDenormalizer:
+#   tags:
+#     - { name: "serializer.normalizer" }
+
