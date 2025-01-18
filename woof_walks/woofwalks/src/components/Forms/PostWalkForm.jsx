@@ -1,194 +1,175 @@
 import React, { useState } from "react";
 
-const CombinedPostForm = () => {
-  // Inputs normaux
-  const [walkFormData, setWalkFormData] = useState({
+const WalkForm = () => {
+  const [formData, setFormData] = useState({
     title: "",
     description: "",
     date: "",
     time: "",
     max_participants: "",
   });
+  const [photo, setPhoto] = useState(null); // Fichier photo sélectionné
+  const [isSubmitting, setIsSubmitting] = useState(false); // Pour gérer l'état de soumission
 
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [message, setMessage] = useState("");
-  const [walkData, setWalkData] = useState(null); // État pour stocker les données de la walk
-  const [photoData, setPhotoData] = useState(null); // État pour stocker les données de la photo
-
-  // Modification des données (clé-valeur)
-  const handleWalkChange = (e) => {
+  //Recupere champs walks et les injecte dans formData
+  const handleChange = (e) => {
     const { name, value } = e.target;
-    setWalkFormData({ ...walkFormData, [name]: value });
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
   };
-
+  //Récupere la photo et l'injecte dans Photo
   const handleFileChange = (e) => {
-    setSelectedFile(e.target.files[0]);
+    setPhoto(e.target.files[0]); // Stocke le fichier sélectionné
   };
 
-  // Logique du submit
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!selectedFile) {
-      setMessage("Veuillez sélectionner une photo avant de continuer.");
+
+    if (!photo) {
+      alert("Veuillez sélectionner une photo !");
       return;
     }
 
-    // Insertion de la photo dans le formData
-    const photoFormData = new FormData();
-    photoFormData.append("file", selectedFile);
+    setIsSubmitting(true);
 
+    //Envoi a l'api la data de la photo, récup_re l'id , injecte l'id dans formdata , envoi la walk a api/walk
     try {
-      // Envoi de la photo
-      const photoResponse = await fetch("https://localhost:8000/api/photos", {
+      // Étape 1 : Upload de la photo
+      const photoFormData = new FormData();
+      photoFormData.append("file", photo);
+
+      const photoResponse = await fetch("https://127.0.0.1:8000/api/photos", {
         method: "POST",
         body: photoFormData,
       });
 
       if (!photoResponse.ok) {
-        setMessage(
-          `Erreur lors de l'upload de la photo: ${photoResponse.statusText}`
-        );
-        return;
+        throw new Error("Erreur lors de l'upload de la photo.");
       }
 
       const photoData = await photoResponse.json();
-      setPhotoData(photoData); // Stocke les données de la photo dans l'état
-      const photoId = photoData["@id"].split("/").pop(); // Récupère l'ID de la photo
-      console.log("Photo ID:", photoId); // Affiche l'ID de la photo dans la console
+      const photoId = photoData.id;
 
-      // Envoi de la walk
-      const walkDataToSend = {
-        ...walkFormData,
-        max_participants: parseInt(walkFormData.max_participants, 10),
-        description: walkFormData.description,
-        title: walkFormData.title,
-        time: walkFormData.time,
-        date: walkFormData.date,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
+      // Étape 2 : Envoi des données avec l'ID de la photo
+      const walkData = {
+        ...formData,
+        photo: photoId,
       };
 
       const walkResponse = await fetch("https://127.0.0.1:8000/api/walks", {
         method: "POST",
         headers: {
-          "Content-Type": "application/ld+json",
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(walkDataToSend),
+        body: JSON.stringify(walkData),
       });
 
       if (!walkResponse.ok) {
-        const errorResponse = await walkResponse.text();
-        setMessage(
-          `Erreur lors de l'enregistrement de la walk: ${errorResponse}`
-        );
-        return;
+        throw new Error("Erreur lors de la création de la promenade.");
       }
 
-      const walkData = await walkResponse.json();
-      setWalkData(walkData); // Stocke les données de la walk dans l'état
-      const walkId = walkData["@id"].split("/").pop(); // Récupère l'ID de la walk
-      console.log("Walk ID:", walkId); // Affiche l'ID de la walk dans la console
+      const walkResult = await walkResponse.json();
+      alert("Promenade créée avec succès !");
+      console.log("Réponse API Walks :", walkResult);
 
-      // Gestion du lien entre la walk et la photo
-      const linkData = {
-        walkId: walkId,
-        photoId: photoId,
-      };
-
-      const linkResponse = await fetch(
-        "https://localhost:8000/api/photo_entity",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(linkData),
-        }
-      );
-
-      if (!linkResponse.ok) {
-        const errorResponse = await linkResponse.text();
-        setMessage(
-          `Erreur lors de l'enregistrement dans photo_entity: ${errorResponse}`
-        );
-        return;
-      }
-
-      setMessage("Walk, photo et lien enregistrés avec succès !");
+      // Réinitialisation du formulaire
+      setFormData({
+        title: "",
+        description: "",
+        date: "",
+        time: "",
+        max_participants: "",
+      });
+      setPhoto(null);
     } catch (error) {
-      setMessage(`Erreur: ${error.message}`);
+      console.error("Erreur :", error);
+      alert("Une erreur est survenue : " + error.message);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <div>
-      <form onSubmit={handleSubmit}>
-        <h3>Créer une Walk avec Photo</h3>
-
-        {/* Formulaire pour les données de la walk */}
-        <input
-          type="text"
-          name="title"
-          value={walkFormData.title}
-          onChange={handleWalkChange}
-          placeholder="Titre"
-          required
-        />
-        <input
-          type="text"
-          name="description"
-          value={walkFormData.description}
-          onChange={handleWalkChange}
-          placeholder="Description"
-          required
-        />
-        <input
-          type="date"
-          name="date"
-          value={walkFormData.date}
-          onChange={handleWalkChange}
-          placeholder="Date"
-          required
-        />
-        <input
-          type="time"
-          name="time"
-          value={walkFormData.time}
-          onChange={handleWalkChange}
-          placeholder="Heure"
-          required
-        />
-
-        <input
-          type="number"
-          name="max_participants"
-          value={walkFormData.max_participants}
-          onChange={handleWalkChange}
-          placeholder="Nombre de participants"
-          required
-        />
-
-        {/* Formulaire pour la photo */}
-        <input type="file" onChange={handleFileChange} required />
-
-        <button type="submit">Envoyer</button>
-
-        {message && <p>{message}</p>}
-      </form>
-
-      {/* Affichage des IDs récupérés */}
-      {walkData && photoData && (
-        <div>
-          <h4>Résultats :</h4>
-          <pre>
-            {`ID de la photo : ${photoData["@id"]
-              .split("/")
-              .pop()}\nID de la walk : ${walkData["@id"].split("/").pop()}`}
-          </pre>
-        </div>
-      )}
-    </div>
+    <form onSubmit={handleSubmit}>
+      <div>
+        <label>
+          Titre:
+          <input
+            type="text"
+            name="title"
+            value={formData.title}
+            onChange={handleChange}
+            required
+          />
+        </label>
+      </div>
+      <div>
+        <label>
+          Description:
+          <textarea
+            name="description"
+            value={formData.description}
+            onChange={handleChange}
+            required
+          ></textarea>
+        </label>
+      </div>
+      <div>
+        <label>
+          Date:
+          <input
+            type="date"
+            name="date"
+            value={formData.date}
+            onChange={handleChange}
+            required
+          />
+        </label>
+      </div>
+      <div>
+        <label>
+          Heure:
+          <input
+            type="time"
+            name="time"
+            value={formData.time}
+            onChange={handleChange}
+            required
+          />
+        </label>
+      </div>
+      <div>
+        <label>
+          Nombre maximum de participants:
+          <input
+            type="number"
+            name="max_participants"
+            value={formData.max_participants}
+            onChange={handleChange}
+            min="1"
+            required
+          />
+        </label>
+      </div>
+      <div>
+        <label>
+          Photo:
+          <input
+            type="file"
+            name="photo"
+            accept="image/*"
+            onChange={handleFileChange}
+            required
+          />
+        </label>
+      </div>
+      <button type="submit" disabled={isSubmitting}>
+        {isSubmitting ? "En cours..." : "Créer la promenade"}
+      </button>
+    </form>
   );
 };
 
-export default CombinedPostForm;
+export default WalkForm;

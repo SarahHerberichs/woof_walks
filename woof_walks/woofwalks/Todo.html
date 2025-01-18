@@ -1,3 +1,44 @@
+##VERSIONING
+<p>Prochain travail :</p>
+<ul>
+  à partir de develop, creer une branche sur laquelle le travail va avancer :
+  <li>- git checkout develop(se positionner sur bonne branche)</li>
+  <li>git checkout -b feature/display-walks</li>
+  <p>
+    --> chaque fonctionnalité est développée dans sa propre branche (exemple
+    display-walks ou user-crud...)
+  </p>
+  <li>
+    - faire les commit dans nouvelle branche tant que travail n'est pas mergable
+    :
+  </li>
+  <li>
+    git add . puis git commit -m "Ajout de la fonctionnalité de display-walks"
+  </li>
+  <li>
+    - quand fonctionnalité terminée : git checkout develop puis git merge
+    feature/display-walks
+  </li>
+</ul>
+<p>FAIRE TOUS LES TESTS</p>
+<ul>
+  <li>git checkout develop</li>
+  <li>git checkout -b release/v1.0.0</li>
+</ul>
+<ul>
+  si vraiment ok :
+  <p>mise en prod dans branche main avec tag!</p>
+  <li>git checkout main et git merge release/v1.0.0 et git push origin main</li>
+  <li>git tag -a v1.0.0 -m "Version 1.0.0 stable" git push origin v1.0.0</li>
+
+  <p>Puis fusion de branche dans develop</p>
+  <li>
+    git checkout develop puis git merge release/v1.0.0 puis git push origin
+    develop
+  </li>
+</ul>
+
+-Faire des user stories et kanban
 exclure de git fichiers sensibles changer identifiants à bdd (root) cleaner le
 css enlever les commentaires créer des tokens! Creer formulaire de login Creer
 espace Utilisateur avec voir mes annonces Ajouter propriété fkuser à chaque walk

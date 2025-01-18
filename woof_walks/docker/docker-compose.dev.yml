@@ -1,0 +1,36 @@
+services:
+  app:
+    build:
+      context: ../woofwalks-api # Contexte du backend
+      dockerfile: Dockerfile # Dockerfile dans le dossier backend
+    container_name: woofwalks-api
+    volumes:
+      - ../woofwalks-api:/var/www/symfony # Lien entre le dossier local et le conteneur
+    ports:
+      - "8000:8000" # Symfony écoute sur le port 8000
+    environment:
+      APP_ENV: dev # Environnement de développement
+      DATABASE_URL: mysql://root:@db:3306/woofwalks
+    depends_on:
+      - db # Dépendance à la base de données
+
+  db:
+    image: mysql:8.0
+    container_name: symfony-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: symfony
+    ports:
+      - "3307:3306" # Base de données MySQL
+
+  frontend:
+    image: node:18 # Utilise une image officielle Node.js
+    container_name: react-app
+    working_dir: /app
+    volumes:
+      - ../woofwalks:/app # Lien entre le dossier frontend local et le conteneur
+    command: ["npm", "start"] # Lance le serveur de développement React
+    ports:
+      - "3000:3000" # React écoute sur le port 3000
+    environment:
+      NODE_ENV: development # Environnement de développement

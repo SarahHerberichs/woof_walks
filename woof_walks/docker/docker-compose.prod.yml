@@ -1,0 +1,35 @@
+services:
+  app:
+    build:
+      context: ../woofwalks-api
+      dockerfile: Dockerfile
+    container_name: woofwalks-api-prod
+    volumes: [] # Pas de volume pour la production (pas de modification directe du code)
+    ports:
+      - "80:80" # Expose le port 80 pour accéder à Symfony
+    environment:
+      APP_ENV: prod # Environnement de production
+      DATABASE_URL: mysql://prod_user:prod_password@db:3306/prod_database
+    depends_on:
+      - db
+
+  db:
+    image: mysql:8.0
+    container_name: symfony-db-prod
+    environment:
+      MYSQL_ROOT_PASSWORD: prod_password
+      MYSQL_DATABASE: prod_database
+    ports:
+      - "3306:3306" # Base de données MySQL en production
+
+  frontend:
+    build:
+      context: ../woofwalks
+    container_name: react-app-prod
+    working_dir: /app
+    command: ["npm", "run", "build"] # Compile React pour la production
+    volumes: [] # Pas de volume en production
+    ports:
+      - "80:80" # Serveur React sur le port 80 en production
+    environment:
+      - NODE_ENV=production # Environnement de production
