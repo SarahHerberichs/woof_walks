@@ -51,7 +51,7 @@ class Photo
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(['photo:read', 'ad:read'])]
+    #[Groups(['photo:read', 'ad:read','walk:read'])]
     private ?int $id = null;
     
 
@@ -66,7 +66,7 @@ class Photo
 
     #[ApiProperty(writable: false)]
     #[ORM\Column(nullable: true)]
-    #[Groups(['photo:read', 'ad:read'])]
+    #[Groups(['photo:read', 'ad:read', 'walk:read'])]
     private ?string $filePath = null;
 
     #[ORM\Column(type: 'datetime', nullable: true)]

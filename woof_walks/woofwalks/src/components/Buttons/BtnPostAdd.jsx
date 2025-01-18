@@ -1,8 +1,9 @@
 import { useState } from "react";
+import walkSpecificFields from "../Forms/walkSpecificFields";
 
-const BtnPostAdd = ({ FormComponents }) => {
+const BtnPostAdd = ({ formContext, formComponents }) => {
   const [showForm, setShowForm] = useState(false);
-
+  console.log(formContext, formComponents);
   const handleClick = () => {
     setShowForm(true);
   };
@@ -10,7 +11,13 @@ const BtnPostAdd = ({ FormComponents }) => {
   return (
     <>
       {showForm ? (
-        FormComponents.map((Component, index) => <Component key={index} />)
+        formComponents.map((Component, index) => (
+          <Component
+            key={index}
+            entityType={formContext}
+            entitySpecificFields={walkSpecificFields}
+          />
+        ))
       ) : (
         <button
           onClick={handleClick}

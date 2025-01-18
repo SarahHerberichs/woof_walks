@@ -22,21 +22,26 @@ class Ad
     #[ORM\Column(type: 'integer')]
     private int $id;
 
+    #[Groups(['ad:read', 'walk:read'])]
     #[ORM\Column(type: 'string', length: 255,  nullable: true)]
     private string $title;
 
+    #[Groups(['ad:read', 'walk:read'])]
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $description = null;
 
+    #[Groups(['ad:read', 'walk:read'])]
     #[ORM\Column(type: 'datetime')]
     private \DateTimeInterface $createdAt;
 
+    #[Groups(['ad:read', 'walk:read'])]
     #[ORM\Column(type: 'datetime')]
     private \DateTimeInterface $updatedAt;
 
+    #[Groups(['ad:read', 'walk:read','photo:read'])]
     #[ORM\ManyToOne(targetEntity: Photo::class)]
     #[ORM\JoinColumn(nullable: false)] // Empêche qu'une annonce soit créée sans photo
-    #[Groups(['ad:read', 'ad:write'])]
+    // #[Groups(['ad:read', 'ad:write'])]
     private Photo $photo;
 
     public function __construct()

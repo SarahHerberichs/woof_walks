@@ -9,14 +9,11 @@ const WalkList = () => {
   useEffect(() => {
     const fetchWalks = async () => {
       try {
-        const response = await axios.get(
-          "https://localhost:8000/api/walks_with_photos",
-          {
-            headers: {
-              Accept: "application/json", // Format attendu par API Platform
-            },
-          }
-        );
+        const response = await axios.get("https://localhost:8000/api/walks", {
+          headers: {
+            Accept: "application/json", // Format attendu par API Platform
+          },
+        });
 
         console.log("Premier log de la réponse:", response.data); // Premier log : données attendues
         setWalks(response.data); // Directement utiliser response.data si c'est un tableau
