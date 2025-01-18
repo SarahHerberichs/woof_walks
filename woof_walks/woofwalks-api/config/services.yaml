@@ -5,7 +5,10 @@ services:
     autowire: true # Autowiring permet à Symfony d'injecter automatiquement les dépendances
     autoconfigure: true #
     public: false
-  # Enregistre tous les contrôleurs dans le namespace App\Controller
+
+  App\Repository\:
+    resource: "../src/Repository"
+    tags: ["doctrine.repository_service"]
   App\Controller\:
     resource: "../src/Controller"
     exclude: "../src/Controller/{Debugger,Tests,Test}"
@@ -31,6 +34,7 @@ services:
   App\Repository\PhotoEntityRepository:
     arguments:
       $registry: "@doctrine"
+
   # Déclare le contrôleur UploadController explicitement comme un service public
   # App\Controller\UploadController:
   #   autowire: true

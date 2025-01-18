@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiProperty;
@@ -19,6 +18,7 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
 #[ORM\Entity]
 #[ApiResource(
     normalizationContext: ['groups' => ['photo:read']],
+    denormalizationContext: ['groups' => ['photo:write']],
     types: ['https://schema.org/MediaObject'],
     outputFormats: ['jsonld' => ['application/ld+json']],
     operations: [
@@ -48,21 +48,29 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
 )]
 class Photo
 {
-    #[ORM\Id, ORM\Column, ORM\GeneratedValue]
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
+    #[Groups(['photo:read', 'ad:read'])]
     private ?int $id = null;
+    
 
     #[ApiProperty(types: ['https://schema.org/contentUrl'], writable: false)]
-    #[Groups(['photo:read'])]
+    #[Groups(['photo:read', 'ad:read'])]
     public ?string $contentUrl = null;
 
     #[Vich\UploadableField(mapping: 'photo', fileNameProperty: 'filePath')]
-    #[Assert\NotNull]
-
-    public ?File $file = null;
+    #[Assert\NotNull(groups: ['photo:write'])]
+    #[Groups(['photo:write'])]
+    private ?File $file = null;
 
     #[ApiProperty(writable: false)]
     #[ORM\Column(nullable: true)]
-    public ?string $filePath = null;
+    #[Groups(['photo:read', 'ad:read'])]
+    private ?string $filePath = null;
+
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $updatedAt = null;
 
     public function getId(): ?int
     {
@@ -71,12 +79,45 @@ class Photo
 
     public function getContentUrl(): ?string
     {
-        // Vérifie si le filePath existe et retourne l'URL complète
         if ($this->filePath) {
-            // Remplacer cette ligne par le chemin d'accès approprié pour l'URL complète
-            return '/media/' . $this->filePath; 
+            return '/media/' . $this->filePath;
         }
 
         return null;
+    }
+
+    public function setFile(?File $file = null): void
+    {
+        $this->file = $file;
+
+        // if ($file) {
+        //     // Met à jour la date de modification à chaque nouvel upload
+        //     $this->updatedAt = new \DateTimeImmutable();
+        // }
+    }
+
+    public function getFile(): ?File
+    {
+        return $this->file;
+    }
+
+    public function getFilePath(): ?string
+    {
+        return $this->filePath;
+    }
+
+    public function setFilePath(?string $filePath): void
+    {
+        $this->filePath = $filePath;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeInterface
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?\DateTimeInterface $updatedAt): void
+    {
+        $this->updatedAt = $updatedAt;
     }
 }
