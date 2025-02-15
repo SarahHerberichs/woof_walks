@@ -11,12 +11,12 @@ const WalkList = () => {
       try {
         const response = await axios.get("https://localhost:8000/api/walks", {
           headers: {
-            Accept: "application/json", // Format attendu par API Platform
+            Accept: "application/json",
           },
         });
 
-        console.log("Premier log de la réponse:", response.data); // Premier log : données attendues
-        setWalks(response.data); // Directement utiliser response.data si c'est un tableau
+        console.log("Premier log de la réponse:", response.data);
+        setWalks(response.data);
       } catch (error) {
         setError("Erreur lors de la récupération des données");
         console.error(error);
@@ -34,7 +34,7 @@ const WalkList = () => {
         ) : (
           walks.map((walk, index) => (
             <div
-              className="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-3 col-xxl-3" // Largeur ajustée pour plus d'espace
+              className="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-3 col-xxl-3"
               key={index}
             >
               <WalkCard walk={walk} />

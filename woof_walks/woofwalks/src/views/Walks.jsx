@@ -13,8 +13,8 @@ const Walks = () => {
   return (
     <>
       <BtnPostAdd
-        formContext="walks" // Passage du contexte spécifique à 'walk'
-        formComponents={formComponents} // Passer les composants génériques à afficher
+        formContext="walks" // Passage du contexte
+        formComponents={formComponents} // Passage des composants génériques
       />
       <WalkList />
     </>

@@ -3,7 +3,7 @@ import walkSpecificFields from "../Forms/walkSpecificFields";
 
 const BtnPostAdd = ({ formContext, formComponents }) => {
   const [showForm, setShowForm] = useState(false);
-  console.log(formContext, formComponents);
+
   const handleClick = () => {
     setShowForm(true);
   };

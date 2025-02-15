@@ -7,7 +7,7 @@ const GenericForm = ({ entityType, entitySpecificFields }) => {
     description: "",
     ...entitySpecificFields.initialValues, // Injecte les champs spécifiques à l'entité
   });
-  const [photo, setPhoto] = useState(null); // Fichier photo sélectionné
+  const [photo, setPhoto] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false); // Pour gérer l'état de soumission
 
   // Gère le changement de valeurs des champs
@@ -21,10 +21,9 @@ const GenericForm = ({ entityType, entitySpecificFields }) => {
 
   // Gère la sélection de la photo
   const handleFileChange = (e) => {
-    setPhoto(e.target.files[0]); // Stocke le fichier sélectionné
+    setPhoto(e.target.files[0]);
   };
 
-  // Soumission du formulaire
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -59,7 +58,7 @@ const GenericForm = ({ entityType, entitySpecificFields }) => {
       };
 
       const entityResponse = await fetch(
-        `https://127.0.0.1:8000/api/${entityType}`,
+        `https://127.0.0.1:8000/api/${entityType}custom`,
         {
           method: "POST",
           headers: {
@@ -85,7 +84,7 @@ const GenericForm = ({ entityType, entitySpecificFields }) => {
       setFormData({
         title: "",
         description: "",
-        ...entitySpecificFields.initialValues, // Réinitialise les champs spécifiques
+        ...entitySpecificFields.initialValues,
       });
       setPhoto(null);
     } catch (error) {

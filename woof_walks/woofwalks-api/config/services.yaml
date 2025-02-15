@@ -5,7 +5,9 @@ services:
     autowire: true # Autowiring permet à Symfony d'injecter automatiquement les dépendances
     autoconfigure: true #
     public: false
-
+  App\EventSubscriber\WalkSubscriber:
+    tags:
+      - { name: doctrine.event_subscriber }
   App\Repository\:
     resource: "../src/Repository"
     tags: ["doctrine.repository_service"]

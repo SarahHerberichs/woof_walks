@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const WalkForm = () => {
+const PostWalkForm = () => {
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -16,7 +16,7 @@ const WalkForm = () => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: value,
+      [name]: name === "max_participants" ? parseInt(value, 10) : value,
     });
   };
   //Récupere la photo et l'injecte dans Photo
@@ -58,13 +58,16 @@ const WalkForm = () => {
         photo: photoId,
       };
 
-      const walkResponse = await fetch("https://127.0.0.1:8000/api/walks", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(walkData),
-      });
+      const walkResponse = await fetch(
+        "https://127.0.0.1:8000/api/walkscustom",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(walkData),
+        }
+      );
 
       if (!walkResponse.ok) {
         throw new Error("Erreur lors de la création de la promenade.");
@@ -73,7 +76,6 @@ const WalkForm = () => {
       const walkResult = await walkResponse.json();
       alert("Promenade créée avec succès !");
       console.log("Réponse API Walks :", walkResult);
-
       // Réinitialisation du formulaire
       setFormData({
         title: "",
@@ -85,6 +87,7 @@ const WalkForm = () => {
       setPhoto(null);
     } catch (error) {
       console.error("Erreur :", error);
+
       alert("Une erreur est survenue : " + error.message);
     } finally {
       setIsSubmitting(false);
@@ -172,4 +175,4 @@ const WalkForm = () => {
   );
 };
 
-export default WalkForm;
+export default PostWalkForm;
