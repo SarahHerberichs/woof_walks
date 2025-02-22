@@ -1,0 +1,5 @@
+PS C:\Users\shx\Desktop\Projet-S1\repo_project_CDA\woof_walks\docker> docker exec -it woofwalks-api bash
+>> 
+root@560cee0e5c69:/var/www/symfony# symfony serve
+bash: symfony: command not found
+root@560cee0e5c69:/var/www/symfony# php -S 0.0.0.0:8000 -t public/
