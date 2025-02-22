@@ -5,13 +5,13 @@ FROM node:18 as build
 WORKDIR /app
 
 # Copier package.json et package-lock.json (ou yarn.lock) pour installer les dépendances
-COPY frontend/package*.json ./
+COPY package*.json ./
 
 # Installer les dépendances de React
 RUN npm install
 
 # Copier tout le reste du code de l'application React
-COPY frontend/ .
+COPY . .
 
 # Construire l'application React (produit la version de production)
 RUN npm run build
@@ -21,7 +21,7 @@ FROM nginx:alpine
 
 # Copier les fichiers construits dans le dossier public de Nginx
 COPY --from=build /app/build /usr/share/nginx/html
-
+COPY nginx.conf /etc/nginx/conf.d/default.conf 
 # Exposer le port 80 pour accéder à l'application React
 EXPOSE 80
 
